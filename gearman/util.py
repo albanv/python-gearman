@@ -36,7 +36,7 @@ class Stopwatch(object):
 
 def disambiguate_server_parameter(hostport_tuple):
     """Takes either a tuple of (address, port) or a string of 'address:port' and disambiguates them for us"""
-    if type(hostport_tuple) is tuple:
+    if isinstance(hostport_tuple, tuple):
         gearman_host, gearman_port = hostport_tuple
     elif ':' in hostport_tuple:
         gearman_host, gearman_possible_port = hostport_tuple.split(':')
@@ -59,7 +59,7 @@ def select(rlist, wlist, xlist, timeout=None):
 
     try:
         rd_list, wr_list, ex_list = select_lib.select(*select_args)
-    except select_lib.error, exc:
+    except select_lib.error as exc:
         # Ignore interrupted system call, reraise anything else
         if exc[0] != errno.EINTR:
             raise

@@ -130,7 +130,7 @@ class ProtocolBinaryCommandsTest(unittest.TestCase):
 
         # Assert we get a non-string argument (expecting BYTES)
         cmd_type = protocol.GEARMAN_COMMAND_JOB_CREATED
-        cmd_args = dict(job_handle=unicode(12345))
+        cmd_args = dict(job_handle=str(12345))
         self.assertRaises(ProtocolError, protocol.pack_binary_command, cmd_type, cmd_args)
 
     def test_packing_response(self):
