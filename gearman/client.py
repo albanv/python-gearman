@@ -3,6 +3,7 @@ from gearman import compat
 import logging
 import os
 import random
+import binascii
 
 import gearman.util
 
@@ -33,7 +34,7 @@ class GearmanClient(GearmanConnectionManager):
 
     def submit_job(self, task, data, unique=None, priority=PRIORITY_NONE, background=False, wait_until_complete=True, max_retries=0, poll_timeout=None):
         """Submit a single job to any gearman server"""
-        job_info = dict(task=task, data=data, unique=unique, priority=priority)
+        job_info = gearman.util.unicode2binary(dict(task=task, data=data, unique=unique, priority=priority))
         completed_job_list = self.submit_multiple_jobs([job_info], background=background, wait_until_complete=wait_until_complete, max_retries=max_retries, poll_timeout=poll_timeout)
         return gearman.util.unlist(completed_job_list)
 
@@ -45,7 +46,7 @@ class GearmanClient(GearmanConnectionManager):
         assert type(jobs_to_submit) in (list, tuple, set), "Expected multiple jobs, received 1?"
 
         # Convert all job dicts to job request objects
-        requests_to_submit = [self._create_request_from_dictionary(job_info, background=background, max_retries=max_retries) for job_info in jobs_to_submit]
+        requests_to_submit = [self._create_request_from_dictionary(gearman.util.unicode2binary(job_info), background=background, max_retries=max_retries) for job_info in jobs_to_submit]
 
         return self.submit_multiple_requests(requests_to_submit, wait_until_complete=wait_until_complete, poll_timeout=poll_timeout)
 
@@ -170,7 +171,7 @@ class GearmanClient(GearmanConnectionManager):
         if job_unique == '-':
             job_unique = job_info['data']
         elif not job_unique:
-            job_unique = os.urandom(self.random_unique_bytes).encode('hex')
+            job_unique = binascii.hexlify(os.urandom(self.random_unique_bytes))
 
         current_job = self.job_class(connection=None, handle=None, task=job_info['task'], unique=job_unique, data=job_info['data'])
 

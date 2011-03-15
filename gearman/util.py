@@ -75,3 +75,10 @@ def unlist(given_list):
         return given_list[0]
     else:
         raise ValueError(list_size)
+
+def unicode2binary(data):
+    if isinstance(data, dict):
+        for key in data:
+            if isinstance(data[key], str):
+                data[key] = data[key].encode()
+    return data

@@ -10,7 +10,7 @@ from gearman.errors import ExceededConnectionAttempts, ServerUnavailable, Invali
 from gearman.protocol import submit_cmd_for_background_priority, GEARMAN_COMMAND_STATUS_RES, GEARMAN_COMMAND_GET_STATUS, GEARMAN_COMMAND_JOB_CREATED, \
     GEARMAN_COMMAND_WORK_STATUS, GEARMAN_COMMAND_WORK_FAIL, GEARMAN_COMMAND_WORK_COMPLETE, GEARMAN_COMMAND_WORK_DATA, GEARMAN_COMMAND_WORK_WARNING
 
-from tests._core_testing import _GearmanAbstractTest, MockGearmanConnectionManager, MockGearmanConnection
+from _core_testing import _GearmanAbstractTest, MockGearmanConnectionManager, MockGearmanConnection
 
 class MockGearmanClient(GearmanClient, MockGearmanConnectionManager):
     pass

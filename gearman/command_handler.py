@@ -47,14 +47,14 @@ class GearmanCommandHandler(object):
         completed_work = None
 
         gearman_command_name = get_command_name(cmd_type)
-        if bool(gearman_command_name == cmd_type) or not gearman_command_name.startswith('GEARMAN_COMMAND_'):
+        if bool(gearman_command_name == cmd_type) or not gearman_command_name.startswith(b'GEARMAN_COMMAND_'):
             unknown_command_msg = 'Could not handle command: %r - %r' % (gearman_command_name, cmd_args)
             gearman_logger.error(unknown_command_msg)
             raise ValueError(unknown_command_msg)
 
-        recv_command_function_name = gearman_command_name.lower().replace('gearman_command_', 'recv_')
+        recv_command_function_name = gearman_command_name.lower().replace(b'gearman_command_', b'recv_')
 
-        cmd_callback = getattr(self, recv_command_function_name, None)
+        cmd_callback = getattr(self, recv_command_function_name.decode(), None)
         if not cmd_callback:
             missing_callback_msg = 'Could not handle command: %r - %r' % (get_command_name(cmd_type), cmd_args)
             gearman_logger.error(missing_callback_msg)

@@ -3,6 +3,7 @@ import logging
 import socket
 import struct
 import time
+import binascii
 
 from gearman.errors import ConnectionError, ProtocolError, ServerUnavailable
 from gearman.constants import DEFAULT_GEARMAN_PORT, _DEBUG_MODE_
@@ -46,8 +47,8 @@ class GearmanConnection(object):
         self._is_server_side = None
 
         # Reset all our raw data buffers
-        self._incoming_buffer = ''
-        self._outgoing_buffer = ''
+        self._incoming_buffer = b''
+        self._outgoing_buffer = b''
 
         # Toss all commands we may have sent or received
         self._incoming_commands = collections.deque()
@@ -140,7 +141,7 @@ class GearmanConnection(object):
         if not self.connected:
             self.throw_exception(message='disconnected')
 
-        recv_buffer = ''
+        recv_buffer = b''
         try:
             recv_buffer = self.gearman_socket.recv(bytes_to_read)
         except socket.error as socket_exception:
@@ -160,7 +161,7 @@ class GearmanConnection(object):
             cmd_type = None
             cmd_args = None
             cmd_len = 0
-        elif given_buffer[0] == NULL_CHAR:
+        elif chr(given_buffer[0]).encode() == NULL_CHAR:
             # We'll be expecting a response if we know we're a client side command
             is_response = bool(self._is_client_side)
             cmd_type, cmd_args, cmd_len = parse_binary_command(given_buffer, is_response=is_response)
@@ -185,9 +186,11 @@ class GearmanConnection(object):
         while self._outgoing_commands:
             cmd_type, cmd_args = self._outgoing_commands.popleft()
             packed_command = self._pack_command(cmd_type, cmd_args)
+            #if isinstance(packed_command, str):
+            #    packed_command = packed_command.encode()
             packed_data.append(packed_command)
 
-        self._outgoing_buffer = ''.join(packed_data)
+        self._outgoing_buffer = b''.join(packed_data)
 
     def send_data_to_socket(self):
         """Send data from buffer -> socket
